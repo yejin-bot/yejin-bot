@@ -110,10 +110,11 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
             
                 response = model.generate_content(full_prompt)
                 # [질문 기록 추가] 이 코드가 질문 내용을 대시보드 뒷단에 기록합니다.
+                # 기존 print 문을 이렇게 바꿔보세요!
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print("="*50)
-                print(f"★[새 질문]★ {now} | 내용: {prompt}")
-                print("="*50)
+                print("="*50, flush=True)
+                print(f"★[LOG] {now} | 질문: {prompt}", flush=True)
+                print("="*50, flush=True)
                 
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
