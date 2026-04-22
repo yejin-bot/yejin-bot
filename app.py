@@ -1,13 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
 
+# 1. 아래 따옴표 안에 예진님의 API 키를 넣으세요
 GOOGLE_API_KEY = "AIzaSyAap3o5GkNo6NRvHkDWOo_P2K_Hpc5O_wQ"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 st.set_page_config(page_title="열일이 - 더존 사내 가이드", page_icon="🤖")
 
-st.title("🤖 더존의 든든한 일꾼, 열일이")
-st.markdown("### 안녕하세요 무엇이든 물어보세요.")
+st.title("🤖 더존의 든든한 일꾼, '열일이'")
+st.markdown("### 안녕하세요 ! 무엇이든 물어보세요.")
 st.divider()
 
 KNOWLEDGE_BASE = """
@@ -47,11 +48,12 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
-        instruction = f"너는 사내 가이드 '열일이'야. 아래 지식만으로 답해줘.\n\n{KNOWLEDGE_BASE}"
+        # 모델 이름을 가장 안정적인 gemini-1.5-flash로 고정했습니다.
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         try:
-            response = model.generate_content([instruction, prompt])
+            full_prompt = f"너는 사내 가이드 '열일이'야. 아래 지식만으로 답해줘.\n\n지식:\n{KNOWLEDGE_BASE}\n\n질문: {prompt}"
+            response = model.generate_content(full_prompt)
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
