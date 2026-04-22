@@ -111,14 +111,15 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
                 response = model.generate_content(full_prompt)
                 # [질문 기록 추가] 이 코드가 질문 내용을 대시보드 뒷단에 기록합니다.
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print(f"[LOG] {now} | 질문 내용: {prompt}")
+                print("="*50)
+                print(f"★[새 질문]★ {now} | 내용: {prompt}")
+                print("="*50)
                 
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
             except Exception as e:
                 # 에러 메시지 안에 '429'나 'quota'라는 단어가 있으면 과부하 메시지 출력!
                 error_msg = str(e)
-                st.error(f"실제 에러 내용: {error_msg}")
                 if "429" in error_msg or "quota" in error_msg:
                     st.warning("🚨 **이멀전씨!! 열일이 과부하로 1분후에 물어봐줘!**")
                 else:
