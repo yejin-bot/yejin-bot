@@ -96,7 +96,7 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
     with st.chat_message("assistant"):
         with st.spinner('열일이가 지식베이스를 기반으로 답변을 생성하고 있습니다...'):
             try:
-                model = genai.GenerativeModel('gemini-2.5-flash')
+                model = genai.GenerativeModel('gemini-3.1-flash-lite-preview')
             
                 full_prompt = f"""
                 당신은 더존비즈온의 전문적인 사내 가이드 챗봇 '열일이'입니다.
