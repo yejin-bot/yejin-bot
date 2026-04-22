@@ -116,4 +116,9 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
             except Exception as e:
-                st.error(f"오류가 발생했습니다: {e}")
+                # 에러 메시지 안에 '429'나 'quota'라는 단어가 있으면 과부하 메시지 출력!
+                error_msg = str(e)
+                if "429" in error_msg or "quota" in error_msg:
+                    st.warning("🚨 **이멀전씨!! 열일이 과부하로 1분후에 물어봐줘!**")
+                else:
+                    st.error(f"⚠️ **오류가 발생했습니다:** {e}")
