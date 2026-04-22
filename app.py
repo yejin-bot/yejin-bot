@@ -108,6 +108,10 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
                 """
             
                 response = model.generate_content(full_prompt)
+                # [질문 기록 추가] 이 코드가 질문 내용을 대시보드 뒷단에 기록합니다.
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"[LOG] {now} | 질문 내용: {prompt}")
+                
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
             except Exception as e:
