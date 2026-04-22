@@ -94,7 +94,7 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
 
     with st.chat_message("assistant"):
         try:
-            model = genai.GenerativeModel('gemini-3-flash-preview')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
             full_prompt = f"""
             당신은 더존비즈온의 전문적인 사내 가이드 챗봇 '열일이'입니다.
