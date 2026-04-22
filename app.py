@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. 여기에 방금 '새 프로젝트'로 만든 따끈따끈한 키를 넣으세요
+# 1. 여기에 새로 만든 API 키를 넣으세요
 GOOGLE_API_KEY = "AIzaSyC3mB0ZYKml2A-ZDJaT2wRVqaW14jRtGe4"
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -48,10 +48,9 @@ if prompt := st.chat_input("질문을 입력하세요"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        # 가장 안정적인 모델 명칭으로 설정했습니다.
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        
+        # model_name을 명시하여 인지 오류를 방지합니다.
         try:
+            model = genai.GenerativeModel(model_name='gemini-1.5-flash')
             full_prompt = f"너는 사내 가이드 '열일이'야. 아래 지식만으로 답해줘.\n\n지식:\n{KNOWLEDGE_BASE}\n\n질문: {prompt}"
             response = model.generate_content(full_prompt)
             st.markdown(response.text)
