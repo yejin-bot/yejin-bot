@@ -6,8 +6,8 @@ genai.configure(api_key=GOOGLE_API_KEY)
 
 st.set_page_config(page_title="열일이 - 더존 사내 가이드", page_icon="🤖")
 
-st.title("🤖 더존의 든든한 일꾼, '열일이'")
-st.markdown("### 안녕하세요! 무엇이든 물어보세요.")
+st.title("🤖 우리의 든든한 일꾼, '열일이'")
+st.markdown("### 안녕하세요 무엇이든 물어보세요.")
 st.divider()
 
 KNOWLEDGE_BASE = """
