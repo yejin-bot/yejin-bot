@@ -14,69 +14,64 @@ if "GOOGLE_API_KEY" not in st.secrets:
 
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
+# [중요] 구글 시트 ID를 여기에 고정합니다 (예진님의 시트 ID로 교체하세요)
+FIXED_SHEET_ID = "10-vzW1ERnEbukhFBNSjbMPOy_dNbm4qWePv3bGAE-98"
+
 # --- 2. 지식 추출 함수 정의 ---
 
-# PDF에서 텍스트 추출
 def get_text_from_pdf(pdf_file):
     try:
         reader = PdfReader(pdf_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        return text
-    except:
-        return ""
+        return "".join([page.extract_text() for page in reader.pages])
+    except: return ""
 
-# Word(.docx)에서 텍스트 추출
 def get_text_from_docx(docx_file):
     try:
         doc = Document(docx_file)
         return "\n".join([para.text for para in doc.paragraphs])
-    except:
-        return ""
+    except: return ""
 
-# 구글 시트에서 데이터 추출 (CSV 방식)
 def get_text_from_sheet(sheet_id):
     try:
-        # 시트 주소에서 추출한 ID를 통해 데이터를 가져옵니다.
         url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
         df = pd.read_csv(url)
         knowledge = ""
         for _, row in df.iterrows():
-            # 예진님이 만드신 헤더(대분류, 소분류, 상세내용)를 합칩니다.
             knowledge += f"[{row['대분류']} - {row['소분류']}]\n{row['상세내용']}\n\n"
         return knowledge
-    except Exception as e:
-        return f"시트 로드 실패: {e}"
+    except: return "시트 지식을 불러올 수 없습니다. ID와 공유 설정을 확인해주세요."
 
 # --- 3. UI 및 지식 통합 ---
 
+# 메인 타이틀 및 인사말
 st.title("🤖 우리의 든든한 일꾼, '열일이'")
-st.markdown("안녕하세요! 무엇이든지 물어보십쇼.")
+st.info(f"""
+**안녕하세요! 저는 열일이입니다.** 모든 답변은 '열일이 지식베이스'를 기반으로 생성되며, 추가로 학습시키고 싶은 정보가 있다면  
+좌측에 파일을 업로드해 주세요. 열일이가 최적의 답변을 제안해 드릴게요!
+""")
 
-# 사이드바 설정
+# 사이드바 설정 (디테일 수정)
 with st.sidebar:
-    st.header("📚 지식 데이터 관리")
+    st.header("📄 지식베이스")
+    st.write("---")
     
-    st.subheader("🔗 구글 시트 연동")
-    # 아래 큰따옴표 사이에 예진님의 실제 구글 시트 ID를 넣어주세요!
-    # 예: "1AbC2_D3EfG4HiJkLmnOpqrStUvWxyZ"
-    target_sheet_id = st.text_input("구글 시트 ID", value="10-vzW1ERnEbukhFBNSjbMPOy_dNbm4qWePv3bGAE-98")
+    # 구글 시트는 백그라운드에서 자동 연동됨
+    st.success("✅ 구글 시트 실무 지식 연동 완료")
     
-    st.subheader("📄 사내 규정 파일 업로드")
-    uploaded_files = st.file_uploader("PDF 또는 Word 파일을 선택하세요", type=["pdf", "docx"], accept_multiple_files=True)
+    # 파일 업로드 (UI 문구 수정)
+    st.subheader("📁 로컬 파일 업로드")
+    uploaded_files = st.file_uploader(
+        "추가 정보를 학습시키려면 PDF 또는 Word 파일을 선택하세요.", 
+        type=["pdf", "docx"], 
+        accept_multiple_files=True
+    )
 
-# 모든 지식 합치기 (최종 프롬프트용)
+# 모든 지식 합치기
 total_knowledge = ""
+total_knowledge += "--- [기본 지식베이스(구글 시트)] ---\n" + get_text_from_sheet(FIXED_SHEET_ID)
 
-# 1. 시트 지식 합치기
-if target_sheet_id and "여기에" not in target_sheet_id:
-    total_knowledge += "--- [구글 시트 실무 지식] ---\n"
-    total_knowledge += get_text_from_sheet(target_sheet_id)
-
-# 2. 파일 지식 합치기
 if uploaded_files:
-    total_knowledge += "\n--- [사내 규정 파일 지식] ---\n"
+    total_knowledge += "\n--- [추가 학습 데이터(사용자 업로드)] ---\n"
     for file in uploaded_files:
         if file.name.endswith('.pdf'):
             total_knowledge += f"\n<파일명: {file.name}>\n" + get_text_from_pdf(file)
@@ -88,27 +83,22 @@ if uploaded_files:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# 이전 대화 내용 출력
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 사용자 입력 받기
-if prompt := st.chat_input("궁금한 점을 물어보세요!"):
+if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로드하여 답변에 활용하세요."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
         try:
-            # 최신 모델 사용
             model = genai.GenerativeModel('gemini-3-flash-preview')
             
-            # AI에게 주는 최종 지침
             full_prompt = f"""
-            당신은 더존비즈온의 사내 가이드 챗봇 '열일이'입니다.
-            제공된 [지식 데이터]를 바탕으로 예진 매니저님의 질문에 친절하고 똑똑하게 답변하세요.
-            데이터에 기반하여 답변하되, 예진 매니저님이 이해하기 쉽게 설명해주는 것이 중요합니다.
+            당신은 더존비즈온의 전문적인 사내 가이드 챗봇 '열일이'입니다.
+            제공된 [지식 데이터]를 바탕으로 예진 매니저님께 신뢰감 있고 친절하게 답변하세요.
 
             [지식 데이터]
             {total_knowledge}
