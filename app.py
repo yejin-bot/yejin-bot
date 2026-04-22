@@ -118,6 +118,7 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
             except Exception as e:
                 # 에러 메시지 안에 '429'나 'quota'라는 단어가 있으면 과부하 메시지 출력!
                 error_msg = str(e)
+                st.error(f"실제 에러 내용: {error_msg}")
                 if "429" in error_msg or "quota" in error_msg:
                     st.warning("🚨 **이멀전씨!! 열일이 과부하로 1분후에 물어봐줘!**")
                 else:
