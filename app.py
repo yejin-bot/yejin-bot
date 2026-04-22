@@ -50,7 +50,7 @@ if prompt := st.chat_input("질문을 입력하세요"):
     with st.chat_message("assistant"):
         try:
             # v1beta 에러를 해결하기 위해 경로를 명시적으로 지정했습니다.
-            model = genai.GenerativeModel(model_name='gemini-pro')
+            model = genai.GenerativeModel('gemini-pro')
             full_prompt = f"너는 사내 가이드 '열일이'야. 아래 지식만으로 답해줘.\n\n지식:\n{KNOWLEDGE_BASE}\n\n질문: {prompt}"
             response = model.generate_content(full_prompt)
             st.markdown(response.text)
