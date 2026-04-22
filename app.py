@@ -1,8 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. 여기에 새로 만든 API 키를 넣으세요
-GOOGLE_API_KEY = "AIzaSyC3mB0ZYKml2A-ZDJaT2wRVqaW14jRtGe4"
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
 st.set_page_config(page_title="열일이 - 더존 사내 가이드", page_icon="🤖")
