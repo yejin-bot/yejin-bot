@@ -67,7 +67,7 @@ if prompt := st.chat_input("예: 셔틀버스 시간 알려줘, 회의실 예약
 
     with st.chat_message("assistant"):
         # AI 모델 호출 (최신 flash 모델 사용)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         
         # 시스템 프롬프트: 열일이의 성격과 지식 주입
         system_instruction = f"""
