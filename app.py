@@ -93,21 +93,22 @@ if prompt := st.chat_input("원하는 내용을 입력하거나 파일을 업로
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        try:
-            model = genai.GenerativeModel('gemini-2.5-flash')
+        with st.spinner('열일이가 지식베이스를 기반으로 답변을 생성하고 있습니다...'):
+            try:
+                model = genai.GenerativeModel('gemini-2.5-flash')
             
-            full_prompt = f"""
-            당신은 더존비즈온의 전문적인 사내 가이드 챗봇 '열일이'입니다.
-            제공된 [지식 데이터]를 바탕으로 선생님께 신뢰감 있고 친절하게 답변하세요.
+                full_prompt = f"""
+                당신은 더존비즈온의 전문적인 사내 가이드 챗봇 '열일이'입니다.
+                제공된 [지식 데이터]를 바탕으로 선생님께 신뢰감 있고 친절하게 답변하세요.
 
-            [지식 데이터]
-            {total_knowledge}
+                [지식 데이터]
+                {total_knowledge}
 
-            질문: {prompt}
-            """
+                질문: {prompt}
+                """
             
-            response = model.generate_content(full_prompt)
-            st.markdown(response.text)
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
-        except Exception as e:
-            st.error(f"오류가 발생했습니다: {e}")
+                response = model.generate_content(full_prompt)
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+            except Exception as e:
+                st.error(f"오류가 발생했습니다: {e}")
